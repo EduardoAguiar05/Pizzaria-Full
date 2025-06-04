@@ -1,26 +1,39 @@
 # Dependencies
 node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
+/frontend/node_modules/
+/backend/node_modules/
 
 # Environment variables
 .env
 .env.local
 .env.*.local
 
-# IDE
-.vscode/
-.idea/
+# Build files
+/frontend/dist/
+/frontend/build/
+/backend/dist/
+/backend/build/
 
 # Logs
-logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Build
-dist/
-build/
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Sistema operacional
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db 

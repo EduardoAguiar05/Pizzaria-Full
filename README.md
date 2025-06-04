@@ -1,53 +1,83 @@
-# Sistema de Pizzaria
+# Sistema de Gerenciamento de Pizzaria
 
-Sistema fullstack para gerenciamento de pedidos de uma pizzaria.
+Sistema fullstack para gerenciamento de uma pizzaria, com funcionalidades de cadastro de clientes, produtos, pedidos e usuários.
 
-## Pré-requisitos
+## Estrutura do Projeto
 
-- Node.js (versão LTS)
-- MongoDB
-- NPM ou Yarn
+O projeto está dividido em duas partes principais:
 
-## Configuração
+- `backend/`: API REST em Node.js com Express e MongoDB
+- `frontend/`: Interface web em HTML/CSS/JavaScript com Bootstrap
 
-1. Clone este repositório
-2. Instale as dependências do backend:
-   ```bash
-   cd backend
-   npm install
-   ```
-3. Instale as dependências do frontend:
-   ```bash
-   cd frontend
-   npm install
-   ```
-4. Crie um arquivo `.env` na pasta backend com o seguinte conteúdo:
-   ```
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/pizzaria
-   JWT_SECRET=sua_chave_secreta_jwt
-   ```
+## Configuração do Backend
 
-## Executando o projeto
+1. Instale as dependências:
+```bash
+cd backend
+npm install
+```
 
-1. Inicie o MongoDB
-2. Em um terminal, inicie o backend:
-   ```bash
-   cd backend
-   npm run dev
-   ```
-3. Em outro terminal, inicie o frontend:
-   ```bash
-   cd frontend
-   npm start
-   ```
-4. Acesse o sistema em: http://localhost:1234
+2. Crie um arquivo `.env` na pasta `backend` com as seguintes variáveis:
+```
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/pizzaria
+JWT_SECRET=sua_chave_secreta_jwt
+```
+
+3. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+
+## Configuração do Frontend
+
+1. Instale as dependências:
+```bash
+cd frontend
+npm install
+```
+
+2. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+```
 
 ## Funcionalidades
 
-- Autenticação de usuários
-- Gerenciamento de produtos (pizzas, bebidas, sobremesas)
-- Cadastro de clientes
-- Sistema de pedidos
-- Status de pedidos
-- Diferentes formas de pagamento 
+### Autenticação
+- Login/Logout
+- Registro de usuários (apenas admin)
+- Proteção de rotas
+
+### Produtos
+- Cadastro de pizzas, bebidas e sobremesas
+- Controle de disponibilidade
+- Preços e ingredientes
+
+### Clientes
+- Cadastro completo com endereço
+- Gerenciamento de informações de contato
+
+### Pedidos
+- Seleção de cliente e produtos
+- Cálculo automático de total
+- Status de pedido
+- Formas de pagamento
+- Observações
+
+## Tecnologias Utilizadas
+
+### Backend
+- Node.js
+- Express
+- MongoDB com Mongoose
+- JWT para autenticação
+- bcryptjs para criptografia
+- cors para segurança
+
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap 5
+- Axios para requisições HTTP 

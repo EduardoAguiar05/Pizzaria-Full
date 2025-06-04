@@ -1,7 +1,7 @@
 {
   "name": "pizzaria-backend",
   "version": "1.0.0",
-  "description": "Backend para sistema de pizzaria",
+  "description": "Backend do sistema de gerenciamento de pizzaria",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

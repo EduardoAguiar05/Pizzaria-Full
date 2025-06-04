@@ -1,18 +1,18 @@
 {
   "name": "pizzaria-frontend",
   "version": "1.0.0",
-  "description": "Frontend para sistema de pizzaria",
-  "main": "index.js",
+  "description": "Frontend do sistema de gerenciamento de pizzaria",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "bootstrap": "^5.2.3",
-    "jwt-decode": "^3.1.2"
+    "axios": "^1.6.7",
+    "bootstrap": "^5.3.3",
+    "sweetalert2": "^11.10.5"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5"
+    "vite": "^5.1.4"
   }
 } 
