@@ -131,4 +131,9 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+// Placeholder para rotas de pedidos
+router.get('/', auth, (req, res) => {
+    res.json({ message: 'Rota de pedidos' });
+});
+
 module.exports = router; 

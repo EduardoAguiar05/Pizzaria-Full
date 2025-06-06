@@ -1,8 +1,6 @@
-import axios from 'axios';
-
 class Api {
   constructor() {
-    this.axios = axios.create();
+    this.axios = window.axios.create();
   }
 
   setBaseURL(url) {

@@ -22,10 +22,8 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'employee'],
     default: 'employee'
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+}, {
+  timestamps: true
 });
 
 // Hash da senha antes de salvar
