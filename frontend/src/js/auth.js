@@ -32,7 +32,6 @@ async function login(email, password) {
     try {
         const response = await api.login(email, password);
         api.setToken(response.token);
-        updateAuthUI();
         
         const userInfo = document.getElementById('userInfo');
         if (userInfo) userInfo.textContent = `Olá, ${response.user.name}`;
@@ -46,6 +45,7 @@ async function login(email, password) {
         });
 
         window.location.hash = '#/pedidos';
+        updateAuthUI();
         return true;
     } catch (error) {
         console.error('Erro no login:', error);
@@ -73,8 +73,8 @@ async function logout() {
         api.removeToken();
         const userInfo = document.getElementById('userInfo');
         if (userInfo) userInfo.textContent = '';
-        updateAuthUI();
         window.location.hash = '#/login';
+        updateAuthUI();
     }
 }
 
@@ -113,8 +113,17 @@ function setupLoginForm() {
 export function initAuth() {
     // Configura o listener de logout
     const logoutLink = document.getElementById('logoutLink');
+    const btnLogout = document.getElementById('btnLogout');
+
     if (logoutLink) {
         logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+    }
+
+    if (btnLogout) {
+        btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
             logout();
         });

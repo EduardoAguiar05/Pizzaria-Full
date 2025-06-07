@@ -35,8 +35,15 @@ class Api {
 
   // Clientes
   async getClientes() {
-    const response = await this.axios.get('/clients');
-    return response.data;
+    try {
+      console.log('Buscando clientes da API...');
+      const response = await this.axios.get('/clients');
+      console.log('Resposta da API (clientes):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar clientes:', error);
+      throw error;
+    }
   }
 
   async getCliente(id) {
@@ -61,8 +68,15 @@ class Api {
 
   // Produtos
   async getProdutos() {
-    const response = await this.axios.get('/products');
-    return response.data;
+    try {
+      console.log('Buscando produtos da API...');
+      const response = await this.axios.get('/products');
+      console.log('Resposta da API (produtos):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar produtos:', error);
+      throw error;
+    }
   }
 
   async getProduto(id) {
@@ -92,23 +106,51 @@ class Api {
 
   // Pedidos
   async getPedidos() {
-    const response = await this.axios.get('/orders');
-    return response.data;
+    try {
+      console.log('Buscando pedidos da API...');
+      const response = await this.axios.get('/orders');
+      console.log('Resposta da API (pedidos):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
+      throw error;
+    }
   }
 
   async getPedido(id) {
-    const response = await this.axios.get(`/orders/${id}`);
-    return response.data;
+    try {
+      console.log(`Buscando pedido ${id} da API...`);
+      const response = await this.axios.get(`/orders/${id}`);
+      console.log('Resposta da API (pedido):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar pedido:', error);
+      throw error;
+    }
   }
 
   async createPedido(data) {
-    const response = await this.axios.post('/orders', data);
-    return response.data;
+    try {
+      console.log('Enviando pedido para API:', data);
+      const response = await this.axios.post('/orders', data);
+      console.log('Resposta da API (criar pedido):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao criar pedido:', error);
+      throw error;
+    }
   }
 
   async updatePedidoStatus(id, status) {
-    const response = await this.axios.patch(`/orders/${id}/status`, { status });
-    return response.data;
+    try {
+      console.log(`Atualizando status do pedido ${id} para ${status}...`);
+      const response = await this.axios.patch(`/orders/${id}/status`, { status });
+      console.log('Resposta da API (atualizar status):', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar status do pedido:', error);
+      throw error;
+    }
   }
 
   async cancelPedido(id) {

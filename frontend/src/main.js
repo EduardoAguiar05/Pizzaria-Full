@@ -13,7 +13,15 @@ api.setRequestInterceptor((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('Requisição sendo enviada:', {
+    url: config.url,
+    method: config.method,
+    hasToken: !!token
+  });
   return config;
+}, error => {
+  console.error('Erro no interceptor de requisição:', error);
+  return Promise.reject(error);
 });
 
 // Inicializa o sistema quando o DOM estiver carregado
@@ -29,21 +37,37 @@ document.addEventListener('DOMContentLoaded', () => {
 function initRouter() {
   const routes = {
     '': 'loginPage',
-    '#pedidos': 'pedidosPage',
-    '#produtos': 'produtosPage',
-    '#clientes': 'clientesPage'
+    '#/login': 'loginPage',
+    '#/pedidos': 'pedidosPage',
+    '#/produtos': 'produtosPage',
+    '#/clientes': 'clientesPage'
   };
 
+  // Adiciona eventos de clique nos links de navegação
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      console.log('Link clicado:', href);
+      window.location.hash = href;
+    });
+  });
+
   function showPage(pageId) {
+    console.log('Mostrando página:', pageId);
     // Esconde todas as páginas
     document.querySelectorAll('.page').forEach(page => {
       page.classList.add('d-none');
+      console.log('Escondendo página:', page.id);
     });
     
     // Mostra a página selecionada
     const page = document.getElementById(pageId);
     if (page) {
+      console.log('Página encontrada:', pageId);
       page.classList.remove('d-none');
+    } else {
+      console.error('Página não encontrada:', pageId);
     }
   }
 
@@ -52,20 +76,28 @@ function initRouter() {
     const pageId = routes[hash];
     const token = api.getToken();
     
+    console.log('Rota atual:', hash);
+    console.log('PageId:', pageId);
+    console.log('Token existe:', !!token);
+    
     // Se não estiver autenticado, redireciona para o login
-    if (!token && hash !== '') {
-      window.location.hash = '';
+    if (!token && hash !== '#/login' && hash !== '') {
+      console.log('Redirecionando para login (não autenticado)');
+      window.location.hash = '#/login';
       return;
     }
 
     // Se estiver autenticado e tentar acessar o login, redireciona para pedidos
-    if (token && hash === '') {
-      window.location.hash = '#pedidos';
+    if (token && (hash === '#/login' || hash === '')) {
+      console.log('Redirecionando para pedidos (já autenticado)');
+      window.location.hash = '#/pedidos';
       return;
     }
 
     if (pageId) {
       showPage(pageId);
+    } else {
+      console.error('Rota não encontrada:', hash);
     }
   }
 
@@ -76,12 +108,52 @@ function initRouter() {
 
 // Interceptor para tratamento de erros
 api.setResponseInterceptor(
-  response => response,
+  response => {
+    console.log('Resposta recebida:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
   error => {
+    console.error('Erro na requisição:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
     if (error.response?.status === 401) {
+      console.log('Token inválido ou expirado, redirecionando para login');
       api.removeToken();
-      window.location.hash = '';
+      window.location.hash = '#/login';
     }
+
+    // Se for erro de validação, mostra mensagem específica
+    if (error.response?.status === 400) {
+      const message = error.response.data.message || 'Dados inválidos';
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de validação',
+        text: message,
+        html: `
+          <div>
+            <p>${message}</p>
+            ${error.response.data.missingFields ? 
+              `<p>Campos faltantes: ${error.response.data.missingFields.join(', ')}</p>` 
+              : ''}
+          </div>
+        `
+      });
+    } else if (error.response?.status === 500) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro no servidor',
+        text: 'Ocorreu um erro ao processar sua requisição. Por favor, tente novamente.'
+      });
+    }
+
     return Promise.reject(error);
   }
 ); 
