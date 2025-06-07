@@ -3,7 +3,7 @@ const auth = require('../middlewares/auth');
 const Product = require('../models/Product');
 
 // Listar todos os produtos
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const products = await Product.find();
     res.json(products);

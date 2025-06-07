@@ -2,7 +2,7 @@ import { api } from './api.js';
 
 // Função para verificar se o usuário está autenticado
 function isAuthenticated() {
-    return api.getToken() !== null;
+    return localStorage.getItem('token') !== null;
 }
 
 // Função para atualizar a UI baseado no estado de autenticação
@@ -31,12 +31,8 @@ function updateAuthUI() {
 async function login(email, password) {
     try {
         const response = await api.login(email, password);
-        api.setToken(response.token);
         
-        const userInfo = document.getElementById('userInfo');
-        if (userInfo) userInfo.textContent = `Olá, ${response.user.name}`;
-
-        await window.Swal.fire({
+        await Swal.fire({
             icon: 'success',
             title: 'Bem-vindo!',
             text: 'Login realizado com sucesso',
@@ -45,22 +41,28 @@ async function login(email, password) {
         });
 
         window.location.hash = '#/pedidos';
-        updateAuthUI();
         return true;
     } catch (error) {
         console.error('Erro no login:', error);
-        await window.Swal.fire({
+        
+        let message = 'Email ou senha inválidos';
+        if (error.response?.status === 500) {
+            message = 'Erro no servidor. Por favor, tente novamente mais tarde.';
+        }
+        
+        await Swal.fire({
             icon: 'error',
             title: 'Erro no login',
-            text: 'Email ou senha inválidos'
+            text: message
         });
+        
         throw error;
     }
 }
 
 // Função para fazer logout
 async function logout() {
-    const result = await window.Swal.fire({
+    const result = await Swal.fire({
         title: 'Deseja sair?',
         text: 'Você será desconectado do sistema',
         icon: 'question',
@@ -70,11 +72,8 @@ async function logout() {
     });
 
     if (result.isConfirmed) {
-        api.removeToken();
-        const userInfo = document.getElementById('userInfo');
-        if (userInfo) userInfo.textContent = '';
+        localStorage.removeItem('token');
         window.location.hash = '#/login';
-        updateAuthUI();
     }
 }
 
@@ -97,6 +96,7 @@ function setupLoginForm() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
@@ -109,29 +109,24 @@ function setupLoginForm() {
     }
 }
 
-// Inicializa o sistema de autenticação
-export function initAuth() {
-    // Configura o listener de logout
-    const logoutLink = document.getElementById('logoutLink');
+// Configura o botão de logout
+function setupLogoutButton() {
     const btnLogout = document.getElementById('btnLogout');
-
-    if (logoutLink) {
-        logoutLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
-    }
-
     if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
             logout();
         });
     }
+}
 
-    // Atualiza a UI inicial
-    updateAuthUI();
-
-    // Configura o formulário de login
+// Inicializa o sistema de autenticação
+export function initAuth() {
     setupLoginForm();
+    setupLogoutButton();
+    
+    // Se não estiver autenticado e não estiver na página de login, redireciona
+    if (!isAuthenticated() && window.location.hash !== '#/login') {
+        window.location.hash = '#/login';
+    }
 } 

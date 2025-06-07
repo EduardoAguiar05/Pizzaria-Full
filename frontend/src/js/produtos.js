@@ -3,10 +3,17 @@ import { api } from './api.js';
 export function initProdutos() {
   const produtosTableBody = document.getElementById('produtosTableBody');
   const novoProdutoForm = document.getElementById('novoProdutoForm');
-  const novoProdutoModal = new bootstrap.Modal('#novoProdutoModal');
+  const novoProdutoModalEl = document.getElementById('novoProdutoModal');
+  const novoProdutoModal = new bootstrap.Modal(novoProdutoModalEl);
 
   let produtos = [];
   let editingId = null;
+
+  // Adicionar evento para limpar o formulário quando o modal for fechado
+  novoProdutoModalEl.addEventListener('hidden.bs.modal', () => {
+    novoProdutoForm.reset();
+    editingId = null;
+  });
 
   // Carregar produtos
   async function loadProdutos() {

@@ -3,10 +3,17 @@ import { api } from './api.js';
 export function initClientes() {
   const clientesTableBody = document.getElementById('clientesTableBody');
   const novoClienteForm = document.getElementById('novoClienteForm');
-  const novoClienteModal = new bootstrap.Modal('#novoClienteModal');
+  const novoClienteModalEl = document.getElementById('novoClienteModal');
+  const novoClienteModal = new bootstrap.Modal(novoClienteModalEl);
 
   let clientes = [];
   let editingId = null;
+
+  // Adicionar evento para limpar o formulário quando o modal for fechado
+  novoClienteModalEl.addEventListener('hidden.bs.modal', () => {
+    novoClienteForm.reset();
+    editingId = null;
+  });
 
   // Carregar clientes
   async function loadClientes() {

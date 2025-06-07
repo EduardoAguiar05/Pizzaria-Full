@@ -1,9 +1,57 @@
 class Api {
   constructor() {
-    this.axios = window.axios.create();
+    this.baseURL = 'http://localhost:3001/api';
+    this.axios = axios.create({
+      baseURL: this.baseURL,
+      timeout: 10000
+    });
+
+    // Interceptor para adicionar token
+    this.axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        console.error('Erro no interceptor de request:', error);
+        return Promise.reject(error);
+      }
+    );
+
+    // Interceptor para tratamento de erros
+    this.axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        console.error('Erro na requisição:', error);
+
+        // Erro de autenticação
+        if (error.response?.status === 401) {
+          this.removeToken();
+          window.location.hash = '#/login';
+          return Promise.reject(new Error('Sessão expirada. Por favor, faça login novamente.'));
+        }
+
+        // Erro de servidor
+        if (error.response?.status === 500) {
+          return Promise.reject(new Error('Erro no servidor. Por favor, tente novamente mais tarde.'));
+        }
+
+        // Erro de conexão
+        if (!error.response) {
+          return Promise.reject(new Error('Erro de conexão. Verifique sua internet.'));
+        }
+
+        return Promise.reject(error);
+      }
+    );
   }
 
+  // Métodos de configuração
   setBaseURL(url) {
+    this.baseURL = url;
     this.axios.defaults.baseURL = url;
   }
 
@@ -19,26 +67,31 @@ class Api {
     return localStorage.getItem('token');
   }
 
-  setToken(token) {
-    localStorage.setItem('token', token);
-  }
-
   removeToken() {
     localStorage.removeItem('token');
   }
 
   // Auth
   async login(email, password) {
-    const response = await this.axios.post('/auth/login', { email, password });
-    return response.data;
+    try {
+      const response = await this.axios.post('/auth/login', { email, password });
+      localStorage.setItem('token', response.data.token);
+      return response.data;
+    } catch (error) {
+      console.error('Erro no login:', error);
+      throw error;
+    }
+  }
+
+  async logout() {
+    localStorage.removeItem('token');
+    window.location.hash = '#/login';
   }
 
   // Clientes
   async getClientes() {
     try {
-      console.log('Buscando clientes da API...');
       const response = await this.axios.get('/clients');
-      console.log('Resposta da API (clientes):', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar clientes:', error);
@@ -46,32 +99,40 @@ class Api {
     }
   }
 
-  async getCliente(id) {
-    const response = await this.axios.get(`/clients/${id}`);
-    return response.data;
-  }
-
   async createCliente(data) {
-    const response = await this.axios.post('/clients', data);
-    return response.data;
+    try {
+      const response = await this.axios.post('/clients', data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao criar cliente:', error);
+      throw error;
+    }
   }
 
   async updateCliente(id, data) {
-    const response = await this.axios.put(`/clients/${id}`, data);
-    return response.data;
+    try {
+      const response = await this.axios.put(`/clients/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar cliente:', error);
+      throw error;
+    }
   }
 
   async deleteCliente(id) {
-    const response = await this.axios.delete(`/clients/${id}`);
-    return response.data;
+    try {
+      const response = await this.axios.delete(`/clients/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao deletar cliente:', error);
+      throw error;
+    }
   }
 
   // Produtos
   async getProdutos() {
     try {
-      console.log('Buscando produtos da API...');
       const response = await this.axios.get('/products');
-      console.log('Resposta da API (produtos):', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
@@ -79,37 +140,50 @@ class Api {
     }
   }
 
-  async getProduto(id) {
-    const response = await this.axios.get(`/products/${id}`);
-    return response.data;
-  }
-
   async createProduto(data) {
-    const response = await this.axios.post('/products', data);
-    return response.data;
+    try {
+      const response = await this.axios.post('/products', data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao criar produto:', error);
+      throw error;
+    }
   }
 
   async updateProduto(id, data) {
-    const response = await this.axios.put(`/products/${id}`, data);
-    return response.data;
+    try {
+      const response = await this.axios.put(`/products/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error);
+      throw error;
+    }
   }
 
   async deleteProduto(id) {
-    const response = await this.axios.delete(`/products/${id}`);
-    return response.data;
+    try {
+      const response = await this.axios.delete(`/products/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao deletar produto:', error);
+      throw error;
+    }
   }
 
   async updateProdutoDisponibilidade(id, available) {
-    const response = await this.axios.patch(`/products/${id}/availability`, { available });
-    return response.data;
+    try {
+      const response = await this.axios.patch(`/products/${id}/availability`, { available });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao atualizar disponibilidade:', error);
+      throw error;
+    }
   }
 
   // Pedidos
   async getPedidos() {
     try {
-      console.log('Buscando pedidos da API...');
       const response = await this.axios.get('/orders');
-      console.log('Resposta da API (pedidos):', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar pedidos:', error);
@@ -119,9 +193,7 @@ class Api {
 
   async getPedido(id) {
     try {
-      console.log(`Buscando pedido ${id} da API...`);
       const response = await this.axios.get(`/orders/${id}`);
-      console.log('Resposta da API (pedido):', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar pedido:', error);
@@ -131,9 +203,7 @@ class Api {
 
   async createPedido(data) {
     try {
-      console.log('Enviando pedido para API:', data);
       const response = await this.axios.post('/orders', data);
-      console.log('Resposta da API (criar pedido):', response.data);
       return response.data;
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
@@ -143,19 +213,22 @@ class Api {
 
   async updatePedidoStatus(id, status) {
     try {
-      console.log(`Atualizando status do pedido ${id} para ${status}...`);
       const response = await this.axios.patch(`/orders/${id}/status`, { status });
-      console.log('Resposta da API (atualizar status):', response.data);
       return response.data;
     } catch (error) {
-      console.error('Erro ao atualizar status do pedido:', error);
+      console.error('Erro ao atualizar status:', error);
       throw error;
     }
   }
 
   async cancelPedido(id) {
-    const response = await this.axios.patch(`/orders/${id}/cancel`);
-    return response.data;
+    try {
+      const response = await this.axios.patch(`/orders/${id}/cancel`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao cancelar pedido:', error);
+      throw error;
+    }
   }
 }
 
